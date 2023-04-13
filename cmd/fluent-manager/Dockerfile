@@ -24,8 +24,11 @@ RUN CGO_ENABLED=0 GO111MODULE=on go build -a -o manager main.go
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
 FROM ghcr.io/oracle/oraclelinux:8-slim
+RUN groupadd -r verrazzano \
+        && useradd -u 1000 -g verrazzano verrazzano \
+        && chown -R 1000:verrazzano /home/verrazzano
 WORKDIR /
-COPY --from=builder /workspace/manager .
-USER nonroot:nonroot
+COPY --from=builder --chown=verrazzano:verrazzano /workspace/manager .
+USER verrazzano
 
 ENTRYPOINT ["/manager"]
