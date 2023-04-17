@@ -1,5 +1,9 @@
 # Build the manager binary
-FROM --platform=$BUILDPLATFORM golang:1.20.3-alpine3.17 as builder
+FROM ghcr.io/oracle/oraclelinux:8-slim as builder
+RUN microdnf update \
+    && microdnf install -y \
+    golang && \
+    microdnf clean all
 
 WORKDIR /workspace
 # Copy the Go Modules manifests
@@ -15,15 +19,21 @@ COPY apis apis/
 COPY controllers controllers/
 COPY pkg pkg/
 
-ARG TARGETOS
-ARG TARGETARCH
-RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} GO111MODULE=on go build -a -o manager main.go
+RUN CGO_ENABLED=0 GO111MODULE=on go build -a -o manager main.go
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
-FROM kubesphere/distroless-static:nonroot
+FROM ghcr.io/oracle/oraclelinux:8-slim
+RUN groupadd -r verrazzano \
+        && useradd -u 1000 -g verrazzano verrazzano \
+        && chown -R 1000:verrazzano /home/verrazzano
 WORKDIR /
-COPY --from=builder /workspace/manager .
-USER nonroot:nonroot
+COPY --from=builder --chown=verrazzano:verrazzano /workspace/manager .
+
+RUN mkdir -p /license
+COPY LICENSE README.md THIRD_PARTY_LICENSES.txt /license/
+
+USER verrazzano
 
 ENTRYPOINT ["/manager"]
+
