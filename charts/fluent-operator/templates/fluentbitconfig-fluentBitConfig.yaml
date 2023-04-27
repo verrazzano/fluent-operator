@@ -9,6 +9,8 @@ metadata:
 spec:
   service:
     parsersFile: parsers.conf
+    routesMaskElements: 16
+    logLevel: debug
   inputSelector:
     matchLabels:
       fluentbit.fluent.io/enabled: "true"

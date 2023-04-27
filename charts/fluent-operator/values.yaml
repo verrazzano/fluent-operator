@@ -15,8 +15,8 @@ operator:
     repository: "docker"
     tag: "20.10"
   container:
-    repository: "kubesphere/fluent-operator"
-    tag: "latest"
+    repository: "iad.ocir.io/odsbuilddev/sandboxes/aditya.b.bharadwaj/fluent-operator"
+    tag: "v26"
   # nodeSelector configuration for Fluent Operator. Ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
   # Node tolerations applied to Fluent Operator. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
@@ -60,8 +60,8 @@ fluentbit:
   crdsEnable: true
   enable: true
   image:
-    repository: "kubesphere/fluent-bit"
-    tag: "v2.0.11"
+    repository: "iad.ocir.io/odsbuilddev/sandboxes/aditya.b.bharadwaj/fluent-bit"
+    tag: "testx"
   # fluentbit resources. If you do want to specify resources, adjust them as necessary
   # You can adjust it based on the log volume.
   resources:
