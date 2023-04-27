@@ -79,7 +79,8 @@ type Service struct {
 	// +kubebuilder:validation:Enum:=off;error;warning;info;debug;trace
 	LogLevel string `json:"logLevel,omitempty"`
 	// Optional 'parsers' config file (can be multiple)
-	ParsersFile string `json:"parsersFile,omitempty"`
+	ParsersFile        string `json:"parsersFile,omitempty"`
+	RoutesMaskElements *int   `json:"routesMaskElements,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -148,6 +149,9 @@ func (s *Service) Params() *params.KVs {
 	}
 	if s.ParsersFile != "" {
 		m.Insert("Parsers_File", s.ParsersFile)
+	}
+	if s.RoutesMaskElements != nil {
+		m.Insert("Routes_Mask_Elements", fmt.Sprint(*s.RoutesMaskElements))
 	}
 	return m
 }
