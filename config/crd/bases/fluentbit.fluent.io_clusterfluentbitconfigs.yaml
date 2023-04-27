@@ -297,6 +297,8 @@ spec:
                   parsersFile:
                     description: Optional 'parsers' config file (can be multiple)
                     type: string
+                  routesMaskElements:
+                    type: integer
                 type: object
             type: object
         type: object
