@@ -612,6 +612,26 @@ func (in *OpenSearch) DeepCopyInto(out *OpenSearch) {
 		*out = new(int32)
 		**out = **in
 	}
+	if in.DataStreamMode != nil {
+		in, out := &in.DataStreamMode, &out.DataStreamMode
+		*out = new(bool)
+		**out = **in
+	}
+	if in.DataStreamName != nil {
+		in, out := &in.DataStreamName, &out.DataStreamName
+		*out = new(string)
+		**out = **in
+	}
+	if in.DataStreamTemplateName != nil {
+		in, out := &in.DataStreamTemplateName, &out.DataStreamTemplateName
+		*out = new(string)
+		**out = **in
+	}
+	if in.TemplateFile != nil {
+		in, out := &in.TemplateFile, &out.TemplateFile
+		*out = new(string)
+		**out = **in
+	}
 	if in.TLS != nil {
 		in, out := &in.TLS, &out.TLS
 		*out = new(plugins.TLS)

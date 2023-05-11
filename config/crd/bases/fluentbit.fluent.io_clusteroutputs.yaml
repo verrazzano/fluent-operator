@@ -1563,6 +1563,12 @@ spec:
                     description: Use current time for index generation instead of
                       message record
                     type: boolean
+                  dataStreamMode:
+                    type: boolean
+                  dataStreamName:
+                    type: string
+                  dataStreamTemplateName:
+                    type: string
                   generateID:
                     description: When enabled, generate _id for outgoing records.
                       This prevents duplicate records when retrying OpenSearch.
@@ -1687,6 +1693,8 @@ spec:
                   tagKey:
                     description: When Include_Tag_Key is enabled, this property defines
                       the key name for the tag.
+                    type: string
+                  templateFile:
                     type: string
                   timeKey:
                     description: When Logstash_Format is enabled, each record will

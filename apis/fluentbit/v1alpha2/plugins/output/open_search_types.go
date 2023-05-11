@@ -92,8 +92,12 @@ type OpenSearch struct {
 	// When enabled, mapping types is removed and Type option is ignored. Types are deprecated in APIs in v7.0. This options is for v7.0 or later.
 	SuppressTypeName *bool `json:"suppressTypeName,omitempty"`
 	// Enables dedicated thread(s) for this output. Default value is set since version 1.8.13. For previous versions is 0.
-	Workers      *int32 `json:"Workers,omitempty"`
-	*plugins.TLS `json:"tls,omitempty"`
+	Workers                *int32  `json:"Workers,omitempty"`
+	DataStreamMode         *bool   `json:"dataStreamMode,omitempty"`
+	DataStreamName         *string `json:"dataStreamName,omitempty"`
+	DataStreamTemplateName *string `json:"dataStreamTemplateName,omitempty"`
+	TemplateFile           *string `json:"templateFile,omitempty"`
+	*plugins.TLS           `json:"tls,omitempty"`
 }
 
 // Name implement Section() method
@@ -214,6 +218,18 @@ func (o *OpenSearch) Params(sl plugins.SecretLoader) (*params.KVs, error) {
 			return nil, err
 		}
 		kvs.Merge(tls)
+	}
+	if o.DataStreamMode != nil {
+		kvs.Insert("Data_Stream_Mode", fmt.Sprint(*o.DataStreamMode))
+	}
+	if o.DataStreamName != nil {
+		kvs.Insert("Data_Stream_Name", *o.DataStreamName)
+	}
+	if o.DataStreamTemplateName != nil {
+		kvs.Insert("Data_Stream_Template_Name", *o.DataStreamTemplateName)
+	}
+	if o.TemplateFile != nil {
+		kvs.Insert("Template_File", *o.TemplateFile)
 	}
 	return kvs, nil
 }
