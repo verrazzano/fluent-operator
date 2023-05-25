@@ -552,6 +552,16 @@ func (in *OpenSearch) DeepCopyInto(out *OpenSearch) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.DataStreamMode != nil {
+		in, out := &in.DataStreamMode, &out.DataStreamMode
+		*out = new(bool)
+		**out = **in
+	}
+	if in.TemplateOverwrite != nil {
+		in, out := &in.TemplateOverwrite, &out.TemplateOverwrite
+		*out = new(bool)
+		**out = **in
+	}
 	if in.Workers != nil {
 		in, out := &in.Workers, &out.Workers
 		*out = new(int32)

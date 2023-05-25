@@ -91,6 +91,16 @@ type OpenSearch struct {
 	LogstashPrefixKey string `json:"logstashPrefixKey,omitempty"`
 	// When enabled, mapping types is removed and Type option is ignored. Types are deprecated in APIs in v7.0. This options is for v7.0 or later.
 	SuppressTypeName *bool `json:"suppressTypeName,omitempty"`
+	// When enabled, data will go to a data stream instead of an index
+	DataStreamMode *bool `json:"dataStreamMode,omitempty"`
+	// Name of the data stream
+	DataStreamName string `json:"dataStreamName,omitempty"`
+	// Index template name
+	DataStreamTemplateName string `json:"dataStreamTemplateName,omitempty"`
+	// Absolute file path of the index template file
+	TemplateFile string `json:"templateFile,omitempty"`
+	// When enabled, the existing index template is overwritten
+	TemplateOverwrite *bool `json:"templateOverwrite,omitempty"`
 	// Enables dedicated thread(s) for this output. Default value is set since version 1.8.13. For previous versions is 0.
 	Workers      *int32 `json:"Workers,omitempty"`
 	*plugins.TLS `json:"tls,omitempty"`
@@ -204,6 +214,21 @@ func (o *OpenSearch) Params(sl plugins.SecretLoader) (*params.KVs, error) {
 	}
 	if o.SuppressTypeName != nil {
 		kvs.Insert("Suppress_Type_Name", fmt.Sprint(*o.SuppressTypeName))
+	}
+	if o.DataStreamMode != nil {
+		kvs.Insert("Data_Stream_Mode", fmt.Sprint(*o.DataStreamMode))
+	}
+	if o.DataStreamName != "" {
+		kvs.Insert("Data_Stream_Name", o.DataStreamName)
+	}
+	if o.DataStreamTemplateName != "" {
+		kvs.Insert("Data_Stream_Template_Name", o.DataStreamTemplateName)
+	}
+	if o.TemplateFile != "" {
+		kvs.Insert("Template_File", o.TemplateFile)
+	}
+	if o.TemplateOverwrite != nil {
+		kvs.Insert("Template_Overwrite", fmt.Sprint(*o.TemplateOverwrite))
 	}
 	if o.Workers != nil {
 		kvs.Insert("Workers", fmt.Sprint(*o.Workers))

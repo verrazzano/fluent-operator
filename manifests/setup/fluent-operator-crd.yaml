@@ -3343,6 +3343,16 @@ spec:
                     description: Use current time for index generation instead of
                       message record
                     type: boolean
+                  dataStreamMode:
+                    description: When enabled, data will go to a data stream instead
+                      of an index
+                    type: boolean
+                  dataStreamName:
+                    description: Name of the data stream
+                    type: string
+                  dataStreamTemplateName:
+                    description: Index template name
+                    type: string
                   generateID:
                     description: When enabled, generate _id for outgoing records.
                       This prevents duplicate records when retrying OpenSearch.
@@ -3468,6 +3478,12 @@ spec:
                     description: When Include_Tag_Key is enabled, this property defines
                       the key name for the tag.
                     type: string
+                  templateFile:
+                    description: Absolute file path of the index template file
+                    type: string
+                  templateOverwrite:
+                    description: When enabled, the existing index template is overwritten
+                    type: boolean
                   timeKey:
                     description: When Logstash_Format is enabled, each record will
                       get a new timestamp field. The Time_Key property defines the
@@ -22604,6 +22620,16 @@ spec:
                     description: Use current time for index generation instead of
                       message record
                     type: boolean
+                  dataStreamMode:
+                    description: When enabled, data will go to a data stream instead
+                      of an index
+                    type: boolean
+                  dataStreamName:
+                    description: Name of the data stream
+                    type: string
+                  dataStreamTemplateName:
+                    description: Index template name
+                    type: string
                   generateID:
                     description: When enabled, generate _id for outgoing records.
                       This prevents duplicate records when retrying OpenSearch.
@@ -22729,6 +22755,12 @@ spec:
                     description: When Include_Tag_Key is enabled, this property defines
                       the key name for the tag.
                     type: string
+                  templateFile:
+                    description: Absolute file path of the index template file
+                    type: string
+                  templateOverwrite:
+                    description: When enabled, the existing index template is overwritten
+                    type: boolean
                   timeKey:
                     description: When Logstash_Format is enabled, each record will
                       get a new timestamp field. The Time_Key property defines the
