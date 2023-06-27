@@ -1,5 +1,5 @@
 ARG FLUENTBIT_BASE
-FROM ghcr.io/oracle/oraclelinux:9-slim as buildergo
+FROM ghcr.io/verrazzano/verrazzano-base-ol9:v1.0.0-20230627070315-744eefa as buildergo
 RUN microdnf update \
     && microdnf install -y \
     golang && \
