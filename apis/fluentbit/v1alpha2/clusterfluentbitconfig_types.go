@@ -58,7 +58,7 @@ type Storage struct {
 	// This option configure a hint of maximum value of memory to use when processing these records
 	BacklogMemLimit string `json:"backlogMemLimit,omitempty"`
 	// If the input plugin has enabled filesystem storage type, this property sets the maximum number of Chunks that can be up in memory
-	MaxChunksUp string `json:"maxChunksUp,omitempty"`
+	MaxChunksUp *int64 `json:"maxChunksUp,omitempty"`
 	// If http_server option has been enabled in the Service section, this option registers a new endpoint where internal metrics of the storage layer can be consumed
 	// +kubebuilder:validation:Enum:=on;off
 	Metrics string `json:"metrics,omitempty"`
@@ -188,8 +188,8 @@ func (s *Service) Params() *params.KVs {
 		if s.Storage.Metrics != "" {
 			m.Insert("storage.metrics", s.Storage.Metrics)
 		}
-		if s.Storage.MaxChunksUp != "" {
-			m.Insert("storage.max_chunks_up", s.Storage.MaxChunksUp)
+		if s.Storage.MaxChunksUp != nil {
+			m.Insert("storage.max_chunks_up", fmt.Sprint(*s.Storage.MaxChunksUp))
 		}
 		if s.Storage.DeleteIrrecoverableChunks != "" {
 			m.Insert("storage.delete_irrecoverable_chunks", s.Storage.DeleteIrrecoverableChunks)
