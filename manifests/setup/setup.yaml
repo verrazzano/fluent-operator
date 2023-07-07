@@ -1449,6 +1449,56 @@ spec:
                   parsersFile:
                     description: Optional 'parsers' config file (can be multiple)
                     type: string
+                  storage:
+                    description: Configure a global environment for the storage layer
+                      in Service
+                    properties:
+                      backlogMemLimit:
+                        description: This option configure a hint of maximum value
+                          of memory to use when processing these records
+                        type: string
+                      checksum:
+                        description: Enable the data integrity check when writing
+                          and reading data from the filesystem
+                        enum:
+                        - "on"
+                        - "off"
+                        type: string
+                      deleteIrrecoverableChunks:
+                        description: When enabled, irrecoverable chunks will be deleted
+                          during runtime, and any other irrecoverable chunk located
+                          in the configured storage path directory will be deleted
+                          when Fluent-Bit starts.
+                        enum:
+                        - "on"
+                        - "off"
+                        type: string
+                      maxChunksUp:
+                        description: If the input plugin has enabled filesystem storage
+                          type, this property sets the maximum number of Chunks that
+                          can be up in memory
+                        format: int64
+                        type: integer
+                      metrics:
+                        description: If http_server option has been enabled in the
+                          Service section, this option registers a new endpoint where
+                          internal metrics of the storage layer can be consumed
+                        enum:
+                        - "on"
+                        - "off"
+                        type: string
+                      path:
+                        description: Select an optional location in the file system
+                          to store streams and chunks of data/
+                        type: string
+                      sync:
+                        description: Configure the synchronization mode used to store
+                          the data into the file system
+                        enum:
+                        - normal
+                        - full
+                        type: string
+                    type: object
                 type: object
             type: object
         type: object
@@ -1804,12 +1854,27 @@ spec:
                       not set, the plugin will use default paths to read local-only
                       logs.
                     type: string
+                  pauseOnChunksOverlimit:
+                    description: Specifies if the input plugin should be paused (stop
+                      ingesting new data) when the storage.max_chunks_up value is
+                      reached.
+                    enum:
+                    - "on"
+                    - "off"
+                    type: string
                   readFromTail:
                     description: Start reading new entries. Skip entries already stored
                       in Journald.
                     enum:
                     - "on"
                     - "off"
+                    type: string
+                  storageType:
+                    description: Specify the buffering mechanism to use. It can be
+                      memory or filesystem
+                    enum:
+                    - filesystem
+                    - memory
                     type: string
                   stripUnderscores:
                     description: Remove the leading underscore of the Journald field
@@ -1956,6 +2021,14 @@ spec:
                       file as part of the record. The value assigned becomes the key
                       in the map.
                     type: string
+                  pauseOnChunksOverlimit:
+                    description: Specifies if the input plugin should be paused (stop
+                      ingesting new data) when the storage.max_chunks_up value is
+                      reached.
+                    enum:
+                    - "on"
+                    - "off"
+                    type: string
                   readFromHead:
                     description: For new discovered files on start (without a database
                       offset/position), read the content from the head of the file,
@@ -1978,6 +2051,13 @@ spec:
                       behavior and instruct Fluent Bit to skip long lines and continue
                       processing other lines that fits into the buffer size.
                     type: boolean
+                  storageType:
+                    description: Specify the buffering mechanism to use. It can be
+                      memory or filesystem
+                    enum:
+                    - filesystem
+                    - memory
+                    type: string
                   tag:
                     description: Set a tag (with regex-extract fields) that will be
                       placed on lines read. E.g. kube.<namespace_name>.<pod_name>.<container_name>
@@ -3564,6 +3644,10 @@ spec:
                         description: Hostname to be used for TLS SNI extension
                         type: string
                     type: object
+                  totalLimitSize:
+                    description: Limit the maximum number of Chunks in the filesystem
+                      for the current output logical destination.
+                    type: string
                   traceError:
                     description: When enabled print the elasticsearch API calls to
                       stdout when elasticsearch returns an error
@@ -23001,6 +23085,10 @@ spec:
                         description: Hostname to be used for TLS SNI extension
                         type: string
                     type: object
+                  totalLimitSize:
+                    description: Limit the maximum number of Chunks in the filesystem
+                      for the current output logical destination.
+                    type: string
                   traceError:
                     description: When enabled print the elasticsearch API calls to
                       stdout when elasticsearch returns an error
