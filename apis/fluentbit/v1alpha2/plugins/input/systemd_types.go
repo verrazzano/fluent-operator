@@ -49,7 +49,7 @@ type Systemd struct {
 	StorageType string `json:"storageType,omitempty"`
 	// Specifies if the input plugin should be paused (stop ingesting new data) when the storage.max_chunks_up value is reached.
 	// +kubebuilder:validation:Enum:=on;off
-	PauseOnChunksOverlimit string `json:"PauseOnChunksOverlimit,omitempty"`
+	PauseOnChunksOverlimit string `json:"pauseOnChunksOverlimit,omitempty"`
 }
 
 func (_ *Systemd) Name() string {
