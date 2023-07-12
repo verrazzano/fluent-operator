@@ -1,5 +1,5 @@
 # Build the manager binary
-FROM ghcr.io/verrazzano/verrazzano-base:v1.0.0-20230327155846-4653b27 as builder
+FROM ghcr.io/verrazzano/verrazzano-base:v1.0.0-20230626111229-3d949a4 as builder
 RUN microdnf install -y \
     golang && \
     microdnf clean all
