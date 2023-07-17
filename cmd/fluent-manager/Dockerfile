@@ -29,8 +29,8 @@ RUN groupadd -r verrazzano \
 WORKDIR /
 COPY --from=builder --chown=verrazzano:verrazzano /workspace/manager .
 
-RUN mkdir -p /license
-COPY LICENSE README.md THIRD_PARTY_LICENSES.txt /license/
+#RUN mkdir -p /license
+#COPY LICENSE README.md THIRD_PARTY_LICENSES.txt /license/
 
 USER verrazzano
 
