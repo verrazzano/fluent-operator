@@ -5,7 +5,9 @@ import (
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -64,33 +66,44 @@ func (r *FluentdReconciler) handleFinalizer(ctx context.Context, instance *fluen
 }
 
 func (r *FluentdReconciler) delete(ctx context.Context, fd *fluentdv1alpha1.Fluentd) error {
-	var sa corev1.ServiceAccount
-	err := r.Get(ctx, client.ObjectKey{Namespace: fd.Namespace, Name: fd.Name}, &sa)
-	if err == nil {
-		if err := r.Delete(ctx, &sa); err != nil && !errors.IsNotFound(err) {
-			return err
-		}
-	} else if !errors.IsNotFound(err) {
+	sa := corev1.ServiceAccount{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      fd.Name,
+			Namespace: fd.Namespace,
+		},
+	}
+	if err := r.Delete(ctx, &sa); err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	// TODO: clusterrole, clusterrolebinding
+
+	sts := appsv1.StatefulSet{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      fd.Name,
+			Namespace: fd.Namespace,
+		},
+	}
+	if err := r.Delete(ctx, &sts); err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 
-	var svc corev1.Service
-	err = r.Get(ctx, client.ObjectKey{Namespace: fd.Namespace, Name: fd.Name}, &svc)
-	if err == nil {
-		if err := r.Delete(ctx, &svc); err != nil && !errors.IsNotFound(err) {
-			return err
-		}
-	} else if !errors.IsNotFound(err) {
+	ds := appsv1.DaemonSet{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      fd.Name,
+			Namespace: fd.Namespace,
+		},
+	}
+	if err := r.Delete(ctx, &ds); err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 
-	var sts appsv1.StatefulSet
-	err = r.Get(ctx, client.ObjectKey{Namespace: fd.Namespace, Name: fd.Name}, &sts)
-	if err == nil {
-		if err := r.Delete(ctx, &sts); err != nil && !errors.IsNotFound(err) {
-			return err
-		}
-	} else if !errors.IsNotFound(err) {
+	svc := corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      fd.Name,
+			Namespace: fd.Namespace,
+		},
+	}
+	if err := r.Delete(ctx, &svc); err != nil && !errors.IsNotFound(err) {
 		return err
 	}
 
@@ -99,13 +112,48 @@ func (r *FluentdReconciler) delete(ctx context.Context, fd *fluentdv1alpha1.Flue
 
 func (r *FluentdReconciler) mutate(obj client.Object, fd *fluentdv1alpha1.Fluentd) controllerutil.MutateFn {
 	switch o := obj.(type) {
+	case *rbacv1.ClusterRole:
+		expected, _, _ := operator.MakeRBACObjects(fd.Name, fd.Namespace, "fluentd", fd.Spec.RBACRules, fd.Spec.ServiceAccountAnnotations)
+
+		return func() error {
+			o.Rules = expected.Rules
+			return nil
+		}
+	case *corev1.ServiceAccount:
+		_, expected, _ := operator.MakeRBACObjects(fd.Name, fd.Namespace, "fluentd", fd.Spec.RBACRules, fd.Spec.ServiceAccountAnnotations)
+
+		return func() error {
+			o.Labels = expected.Labels
+			o.Annotations = expected.Annotations
+			if err := ctrl.SetControllerReference(fd, o, r.Scheme); err != nil {
+				return err
+			}
+			return nil
+		}
+	case *rbacv1.ClusterRoleBinding:
+		_, _, expected := operator.MakeRBACObjects(fd.Name, fd.Namespace, "fluentd", fd.Spec.RBACRules, fd.Spec.ServiceAccountAnnotations)
+
+		return func() error {
+			o.RoleRef = expected.RoleRef
+			o.Subjects = expected.Subjects
+			return nil
+		}
 	case *appsv1.StatefulSet:
-		expected := operator.MakeStatefulset(*fd)
+		expected := operator.MakeStatefulSet(*fd)
 
 		return func() error {
 			o.Labels = expected.Labels
 			o.Spec = expected.Spec
-			o.SetOwnerReferences(nil)
+			if err := ctrl.SetControllerReference(fd, o, r.Scheme); err != nil {
+				return err
+			}
+			return nil
+		}
+	case *appsv1.DaemonSet:
+		expected := operator.MakeFluentdDaemonSet(*fd)
+		return func() error {
+			o.Labels = expected.Labels
+			o.Spec = expected.Spec
 			if err := ctrl.SetControllerReference(fd, o, r.Scheme); err != nil {
 				return err
 			}
@@ -118,13 +166,11 @@ func (r *FluentdReconciler) mutate(obj client.Object, fd *fluentdv1alpha1.Fluent
 			o.Labels = expected.Labels
 			o.Spec.Selector = expected.Spec.Selector
 			o.Spec.Ports = expected.Spec.Ports
-			o.SetOwnerReferences(nil)
 			if err := ctrl.SetControllerReference(fd, o, r.Scheme); err != nil {
 				return err
 			}
 			return nil
 		}
-
 	default:
 	}
 

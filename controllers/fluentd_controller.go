@@ -91,41 +91,57 @@ func (r *FluentdReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	// Install RBAC resources for the filter plugin kubernetes
-	var rbacObj, saObj, bindingObj = operator.MakeRBACObjects(fd.Name, fd.Namespace, "fluentd", fd.Spec.RBACRules, fd.Spec.ServiceAccountAnnotations)
-
-	// Set ServiceAccount's owner to this Fluentd
-	if err := ctrl.SetControllerReference(&fd, saObj, r.Scheme); err != nil {
+	cr, sa, crb := operator.MakeRBACObjects(fd.Name, fd.Namespace, "fluentd", fd.Spec.RBACRules, fd.Spec.ServiceAccountAnnotations)
+	// Deploy Fluentd ClusterRole
+	if _, err := controllerutil.CreateOrPatch(ctx, r.Client, cr, r.mutate(cr, &fd)); err != nil {
 		return ctrl.Result{}, err
 	}
-	if err := r.Create(ctx, rbacObj); err != nil && !errors.IsAlreadyExists(err) {
+	// Deploy Fluentd ClusterRoleBinding
+	if _, err := controllerutil.CreateOrPatch(ctx, r.Client, crb, r.mutate(crb, &fd)); err != nil {
 		return ctrl.Result{}, err
 	}
-	if err := r.Create(ctx, saObj); err != nil && !errors.IsAlreadyExists(err) {
+	// Deploy Fluentd ServiceAccount
+	if _, err := controllerutil.CreateOrPatch(ctx, r.Client, sa, r.mutate(sa, &fd)); err != nil {
 		return ctrl.Result{}, err
 	}
-	if err := r.Create(ctx, bindingObj); err != nil && !errors.IsAlreadyExists(err) {
-		return ctrl.Result{}, err
+	var err error
+	if fd.Spec.Mode == "agent" {
+		// Deploy Fluentd DaemonSet
+		ds := operator.MakeFluentdDaemonSet(fd)
+		_, err = controllerutil.CreateOrPatch(ctx, r.Client, ds, r.mutate(ds, &fd))
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+		sts := appsv1.StatefulSet{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      fd.Name,
+				Namespace: fd.Namespace,
+			},
+		}
+		if err = r.Delete(ctx, &sts); err != nil && !errors.IsNotFound(err) {
+			return ctrl.Result{}, err
+		}
+	} else {
+		// Deploy Fluentd StatefulSet
+		sts := operator.MakeStatefulSet(fd)
+		_, err = controllerutil.CreateOrPatch(ctx, r.Client, sts, r.mutate(sts, &fd))
+		ds := appsv1.DaemonSet{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      fd.Name,
+				Namespace: fd.Namespace,
+			},
+		}
+		if err = r.Delete(ctx, &ds); err != nil && !errors.IsNotFound(err) {
+			return ctrl.Result{}, err
+		}
 	}
-
-	// Deploy Fluentd Statefulset
-	dp := operator.MakeStatefulset(fd)
-	if err := ctrl.SetControllerReference(&fd, dp, r.Scheme); err != nil {
-		return ctrl.Result{}, err
-	}
-
-	if _, err := controllerutil.CreateOrPatch(ctx, r.Client, dp, r.mutate(dp, &fd)); err != nil {
-		return ctrl.Result{}, err
-	}
-
 	// Deploy Fluentd Service
 	if !fd.Spec.DisableService {
 		svc := operator.MakeFluentdService(fd)
-		if err := ctrl.SetControllerReference(&fd, svc, r.Scheme); err != nil {
-			return ctrl.Result{}, err
-		}
-
-		if _, err := controllerutil.CreateOrPatch(ctx, r.Client, svc, r.mutate(svc, &fd)); err != nil {
-			return ctrl.Result{}, err
+		if len(svc.Spec.Ports) > 0 {
+			if _, err = controllerutil.CreateOrPatch(ctx, r.Client, svc, r.mutate(svc, &fd)); err != nil {
+				return ctrl.Result{}, err
+			}
 		}
 	}
 
@@ -137,6 +153,22 @@ func (r *FluentdReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		// Grab the job object, extract the owner.
 		sec := rawObj.(*corev1.Secret)
 		owner := metav1.GetControllerOf(sec)
+		if owner == nil {
+			return nil
+		}
+
+		if owner.APIVersion != fluentdApiGVStr || owner.Kind != "Fluentd" {
+			return nil
+		}
+		return []string{owner.Name}
+	}); err != nil {
+		return err
+	}
+
+	if err := mgr.GetFieldIndexer().IndexField(context.Background(), &appsv1.DaemonSet{}, fluentdOwnerKey, func(rawObj client.Object) []string {
+		// grab the job object, extract the owner.
+		ds := rawObj.(*appsv1.DaemonSet)
+		owner := metav1.GetControllerOf(ds)
 		if owner == nil {
 			return nil
 		}
@@ -184,6 +216,7 @@ func (r *FluentdReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&fluentdv1alpha1.Fluentd{}).
 		Owns(&corev1.ServiceAccount{}).
+		Owns(&appsv1.DaemonSet{}).
 		Owns(&appsv1.StatefulSet{}).
 		Owns(&corev1.Service{}).
 		Complete(r)
