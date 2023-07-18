@@ -170,12 +170,5 @@ func MakeFluentdDaemonSet(fd fluentdv1alpha1.Fluentd) *appsv1.DaemonSet {
 			return &daemonSet
 		}
 	}
-
-	if fd.Spec.BufferVolume == nil || !fd.Spec.BufferVolume.DisableBufferVolume {
-		daemonSet.Spec.Template.Spec.Containers[0].VolumeMounts = append(daemonSet.Spec.Template.Spec.Containers[0].VolumeMounts, corev1.VolumeMount{
-			Name:      fmt.Sprintf("%s-buffer-pvc", fd.Name),
-			MountPath: BufferMountPath,
-		})
-	}
 	return &daemonSet
 }
