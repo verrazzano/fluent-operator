@@ -87,6 +87,16 @@ func (r *FluentdReconciler) delete(ctx context.Context, fd *fluentdv1alpha1.Flue
 		return err
 	}
 
+	ds := appsv1.DaemonSet{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      fd.Name,
+			Namespace: fd.Namespace,
+		},
+	}
+	if err := r.Delete(ctx, &ds); err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	
 	svc := corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fd.Name,
@@ -131,6 +141,16 @@ func (r *FluentdReconciler) mutate(obj client.Object, fd *fluentdv1alpha1.Fluent
 	case *appsv1.StatefulSet:
 		expected := operator.MakeStatefulset(*fd)
 
+		return func() error {
+			o.Labels = expected.Labels
+			o.Spec = expected.Spec
+			if err := ctrl.SetControllerReference(fd, o, r.Scheme); err != nil {
+				return err
+			}
+			return nil
+		}
+	case *appsv1.DaemonSet:
+		expected := operator.MakeFluentdDaemonSet(*fd)
 		return func() error {
 			o.Labels = expected.Labels
 			o.Spec = expected.Spec

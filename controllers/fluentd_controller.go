@@ -110,12 +110,31 @@ func (r *FluentdReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		// Deploy Fluentd DaemonSet
 		ds := operator.MakeFluentdDaemonSet(fd)
 		_, err = controllerutil.CreateOrPatch(ctx, r.Client, ds, r.mutate(ds, &fd))
-
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+		sts := appsv1.StatefulSet{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      fd.Name,
+				Namespace: fd.Namespace,
+			},
+		}
+		if err = r.Delete(ctx, &sts); err != nil && !errors.IsNotFound(err) {
+			return ctrl.Result{}, err
+		}
 	} else {
 		// Deploy Fluentd Statefulset
 		sts := operator.MakeStatefulset(fd)
 		_, err = controllerutil.CreateOrPatch(ctx, r.Client, sts, r.mutate(sts, &fd))
-
+		ds := appsv1.DaemonSet{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      fd.Name,
+				Namespace: fd.Namespace,
+			},
+		}
+		if err = r.Delete(ctx, &ds); err != nil && !errors.IsNotFound(err) {
+			return ctrl.Result{}, err
+		}
 	}
 	if err != nil {
 		return ctrl.Result{}, err
