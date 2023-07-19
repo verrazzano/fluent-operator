@@ -139,8 +139,10 @@ func (r *FluentdReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	// Deploy Fluentd Service
 	if !fd.Spec.DisableService {
 		svc := operator.MakeFluentdService(fd)
-		if _, err = controllerutil.CreateOrPatch(ctx, r.Client, svc, r.mutate(svc, &fd)); err != nil {
-			return ctrl.Result{}, err
+		if len(svc.Spec.Ports) > 0 {
+			if _, err = controllerutil.CreateOrPatch(ctx, r.Client, svc, r.mutate(svc, &fd)); err != nil {
+				return ctrl.Result{}, err
+			}
 		}
 	}
 

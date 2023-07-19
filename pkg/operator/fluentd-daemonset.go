@@ -27,9 +27,7 @@ func MakeFluentdDaemonSet(fd fluentdv1alpha1.Fluentd) *appsv1.DaemonSet {
 			}
 		}
 	}
-
-	defaultFsGroup := DefaultFsGroup
-
+	
 	daemonSet := appsv1.DaemonSet{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        fd.Name,
@@ -88,9 +86,6 @@ func MakeFluentdDaemonSet(fd fluentdv1alpha1.Fluentd) *appsv1.DaemonSet {
 					NodeSelector: fd.Spec.NodeSelector,
 					Tolerations:  fd.Spec.Tolerations,
 					Affinity:     fd.Spec.Affinity,
-					SecurityContext: &corev1.PodSecurityContext{
-						FSGroup: &defaultFsGroup,
-					},
 				},
 			},
 		},
@@ -131,7 +126,7 @@ func MakeFluentdDaemonSet(fd fluentdv1alpha1.Fluentd) *appsv1.DaemonSet {
 		})
 		daemonSet.Spec.Template.Spec.Containers[0].VolumeMounts = append(daemonSet.Spec.Template.Spec.Containers[0].VolumeMounts, corev1.VolumeMount{
 			Name:      "positions",
-			MountPath: "/fluent-bit/tail",
+			MountPath: "/fluentd/tail",
 		})
 	}
 	// Mount host or emptydir VolumeSource
