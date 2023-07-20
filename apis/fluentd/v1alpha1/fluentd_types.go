@@ -41,9 +41,9 @@ type FluentdSpec struct {
 	// Select cluster output plugins used to send all logs that did not match any route to the matching outputs
 	DefaultOutputSelector *metav1.LabelSelector `json:"defaultOutputSelector,omitempty"`
 	// By default will build the related service according to the globalinputs definition.
-	DisableService  bool            `json:"disableService,omitempty"`
-	DaemonSetSpec   DaemonSetSpec   `json:"daemonSetSpec,omitempty"`
-	StatefulSetSpec StatefulSetSpec `json:"statefulSetSpec,omitempty"`
+	DisableService bool `json:"disableService,omitempty"`
+	// Numbers of the Fluentd instance
+	Replicas *int32 `json:"replicas,omitempty"`
 	// Numbers of the workers in Fluentd instance
 	Workers *int32 `json:"workers,omitempty"`
 	// Global logging verbosity
@@ -87,32 +87,26 @@ type FluentdSpec struct {
 	Volumes []corev1.Volume `json:"volumes,omitempty"`
 	// Pod volumes to mount into the container's filesystem. Cannot be updated.
 	VolumeMounts []corev1.VolumeMount `json:"volumeMounts,omitempty"`
-	// Service represents configurations on the fluentd service.
-	Service FluentDService `json:"service,omitempty"`
-	// PodSecurityContext represents the security context for the fluentd pods.
-	SecurityContext *corev1.PodSecurityContext `json:"securityContext,omitempty"`
-	// SchedulerName represents the desired scheduler for fluentd pods.
-	SchedulerName string `json:"schedulerName,omitempty"`
-	// ContainerSecurityContext represents the security context for the fluentd container.
-	ContainerSecurityContext *corev1.SecurityContext `json:"containerSecurityContext,omitempty"`
-	// Storage for position db. You will use it if tail input is enabled.
-	PositionDB corev1.VolumeSource `json:"positionDB,omitempty"`
-}
-
-// DaemonSetSpec md
-type DaemonSetSpec struct {
-	Enable bool `json:"enable,omitempty"`
-}
-
-type StatefulSetSpec struct {
-	// Numbers of the Fluentd instance
-	Replicas *int32 `json:"replicas,omitempty"`
 	// volumeClaimTemplates is a list of claims that pods are allowed to reference.
 	// The StatefulSet controller is responsible for mapping network identities to
 	// claims in a way that maintains the identity of a pod. Every claim in
 	// this list must have at least one matching (by name) volumeMount in one
 	// container in the template.
 	VolumeClaimTemplates []corev1.PersistentVolumeClaim `json:"volumeClaimTemplates,omitempty"`
+	// Service represents configurations on the fluentd service.
+	Service FluentDService `json:"service,omitempty"`
+	// PodSecurityContext represents the security context for the fluentd pods.
+	SecurityContext *corev1.PodSecurityContext `json:"securityContext,omitempty"`
+	// SchedulerName represents the desired scheduler for fluentd pods.
+	SchedulerName string `json:"schedulerName,omitempty"`
+	// Mode to determine whether to run Fluentd as collector or agent.
+	// +kubebuilder:validation:Enum:=collector;agent
+	// +kubebuilder:default:=collector
+	Mode string `json:"mode,omitempty"`
+	// ContainerSecurityContext represents the security context for the fluentd container.
+	ContainerSecurityContext *corev1.SecurityContext `json:"containerSecurityContext,omitempty"`
+	// Storage for position db. You will use it if tail input is enabled.
+	PositionDB corev1.VolumeSource `json:"positionDB,omitempty"`
 }
 
 // FluentDService the service of the FluentD

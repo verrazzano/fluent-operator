@@ -106,7 +106,7 @@ func (r *FluentdReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	var err error
-	if fd.Spec.DaemonSetSpec.Enable {
+	if fd.Spec.Mode == "agent" {
 		// Deploy Fluentd DaemonSet
 		ds := operator.MakeFluentdDaemonSet(fd)
 		_, err = controllerutil.CreateOrPatch(ctx, r.Client, ds, r.mutate(ds, &fd))
@@ -123,8 +123,8 @@ func (r *FluentdReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			return ctrl.Result{}, err
 		}
 	} else {
-		// Deploy Fluentd Statefulset
-		sts := operator.MakeStatefulset(fd)
+		// Deploy Fluentd StatefulSet
+		sts := operator.MakeStatefulSet(fd)
 		_, err = controllerutil.CreateOrPatch(ctx, r.Client, sts, r.mutate(sts, &fd))
 		ds := appsv1.DaemonSet{
 			ObjectMeta: metav1.ObjectMeta{

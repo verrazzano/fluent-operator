@@ -11,9 +11,9 @@ spec:
     - forward:
         bind: 0.0.0.0
         port: {{ .Values.fluentd.port }}
-  statefulSetSpec:
-    replicas: {{ .Values.fluentd.replicas }}
+  replicas: {{ .Values.fluentd.replicas }}
   image: {{ .Values.fluentd.image.repository }}:{{ .Values.fluentd.image.tag }}
+  mode: "collector"
   resources:
   {{- toYaml .Values.fluentd.resources | nindent 4  }}
   fluentdCfgSelector:

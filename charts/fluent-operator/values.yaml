@@ -12,8 +12,8 @@ operator:
   # The init container is to get the actual storage path of the docker log files so that it can be mounted to collect the logs.
   # see https://github.com/fluent/fluent-operator/blob/master/manifests/setup/fluent-operator-deployment.yaml#L26
   initcontainer:
-    repository: "docker"
-    tag: "20.10"
+    repository: "ghcr.io/oracle/oraclelinux"
+    tag: "8"
 
     resources:
       limits:
@@ -23,8 +23,8 @@ operator:
         cpu: 50m
         memory: 64Mi
   container:
-    repository: "kubesphere/fluent-operator"
-    tag: "latest"
+    repository: "ghcr.io/verrazzano/fluent-operator-jenkins"
+    tag: "20230719053902-aefd144"
   # nodeSelector configuration for Fluent Operator. Ref: https://kubernetes.io/docs/user-guide/node-selection/
   nodeSelector: {}
   # Node tolerations applied to Fluent Operator. Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
@@ -70,8 +70,8 @@ fluentbit:
   crdsEnable: true
   enable: true
   image:
-    repository: "kubesphere/fluent-bit"
-    tag: "v2.1.6"
+    repository: "ghcr.io/verrazzano/fluent-bit"
+    tag: "v2.0.11-20230628072810-c499f26ce"
   # fluentbit resources. If you do want to specify resources, adjust them as necessary
   # You can adjust it based on the log volume.
   resources:
@@ -266,12 +266,12 @@ fluentbit:
 fluentd:
   # Installs a sub chart carrying the CRDs for the fluentd controller. The sub chart is enabled by default.
   crdsEnable: true
-  enable: false
+  enable: true
   name: fluentd
   port: 24224
   image:
-    repository: "kubesphere/fluentd"
-    tag: "v1.15.3"
+    repository: "iad.ocir.io/odsbuilddev/sandboxes/karan.k/public/fluentd2"
+    tag: "v13"
   replicas: 1
   forward:
     port: 24224

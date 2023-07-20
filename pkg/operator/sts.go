@@ -31,8 +31,8 @@ const (
 	InputHttpType    = "http"
 )
 
-func MakeStatefulset(fd fluentdv1alpha1.Fluentd) *appsv1.StatefulSet {
-	replicas := *fd.Spec.StatefulSetSpec.Replicas
+func MakeStatefulSet(fd fluentdv1alpha1.Fluentd) *appsv1.StatefulSet {
+	replicas := *fd.Spec.Replicas
 	if replicas == 0 {
 		replicas = 1
 	}
@@ -137,8 +137,8 @@ func MakeStatefulset(fd fluentdv1alpha1.Fluentd) *appsv1.StatefulSet {
 		sts.Spec.Template.Spec.Containers[0].VolumeMounts = append(sts.Spec.Template.Spec.Containers[0].VolumeMounts, fd.Spec.VolumeMounts...)
 	}
 
-	if fd.Spec.StatefulSetSpec.VolumeClaimTemplates != nil {
-		sts.Spec.VolumeClaimTemplates = append(sts.Spec.VolumeClaimTemplates, fd.Spec.StatefulSetSpec.VolumeClaimTemplates...)
+	if fd.Spec.VolumeClaimTemplates != nil {
+		sts.Spec.VolumeClaimTemplates = append(sts.Spec.VolumeClaimTemplates, fd.Spec.VolumeClaimTemplates...)
 	}
 
 	if fd.Spec.EnvVars != nil {
