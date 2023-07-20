@@ -27,7 +27,7 @@ func MakeFluentdDaemonSet(fd fluentdv1alpha1.Fluentd) *appsv1.DaemonSet {
 			}
 		}
 	}
-	
+
 	daemonSet := appsv1.DaemonSet{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        fd.Name,
@@ -58,6 +58,22 @@ func MakeFluentdDaemonSet(fd fluentdv1alpha1.Fluentd) *appsv1.DaemonSet {
 								},
 							},
 						},
+						{
+							Name: "varlogs",
+							VolumeSource: corev1.VolumeSource{
+								HostPath: &corev1.HostPathVolumeSource{
+									Path: "/var/log",
+								},
+							},
+						},
+						{
+							Name: "systemd",
+							VolumeSource: corev1.VolumeSource{
+								HostPath: &corev1.HostPathVolumeSource{
+									Path: "/var/log/journal",
+								},
+							},
+						},
 					},
 					Containers: []corev1.Container{
 						{
@@ -71,6 +87,16 @@ func MakeFluentdDaemonSet(fd fluentdv1alpha1.Fluentd) *appsv1.DaemonSet {
 									Name:      SecretVolName,
 									ReadOnly:  true,
 									MountPath: FluentdMountPath,
+								},
+								{
+									Name:      "varlogs",
+									ReadOnly:  true,
+									MountPath: "/var/log/",
+								},
+								{
+									Name:      "systemd",
+									ReadOnly:  true,
+									MountPath: "/var/log/journal",
 								},
 							},
 							Resources: fd.Spec.Resources,
