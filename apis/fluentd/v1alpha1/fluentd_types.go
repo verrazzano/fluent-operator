@@ -47,6 +47,8 @@ type FluentdSpec struct {
 	Image string `json:"image,omitempty"`
 	// Fluentd Watcher command line arguments.
 	Args []string `json:"args,omitempty"`
+	// EnvVars represent environment variables that can be passed to fluentd pods.
+	EnvVars []corev1.EnvVar `json:"envVars,omitempty"`
 	// FluentdCfgSelector defines the selectors to select the fluentd config CRs.
 	FluentdCfgSelector metav1.LabelSelector `json:"fluentdCfgSelector,omitempty"`
 	// Buffer definition
@@ -59,6 +61,8 @@ type FluentdSpec struct {
 	Resources corev1.ResourceRequirements `json:"resources,omitempty"`
 	// NodeSelector
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
+	// Annotations to add to each Fluentd pod.
+	Annotations map[string]string `json:"annotations,omitempty"`
 	// Annotations to add to the Fluentd service account
 	ServiceAccountAnnotations map[string]string `json:"serviceAccountAnnotations,omitempty"`
 	// Pod's scheduling constraints.

@@ -709,6 +709,13 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
+	if in.EnvVars != nil {
+		in, out := &in.EnvVars, &out.EnvVars
+		*out = make([]corev1.EnvVar, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
+	}
 	in.FluentdCfgSelector.DeepCopyInto(&out.FluentdCfgSelector)
 	if in.BufferVolume != nil {
 		in, out := &in.BufferVolume, &out.BufferVolume
@@ -723,6 +730,13 @@ func (in *FluentdSpec) DeepCopyInto(out *FluentdSpec) {
 	in.Resources.DeepCopyInto(&out.Resources)
 	if in.NodeSelector != nil {
 		in, out := &in.NodeSelector, &out.NodeSelector
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
+	if in.Annotations != nil {
+		in, out := &in.Annotations, &out.Annotations
 		*out = make(map[string]string, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val
