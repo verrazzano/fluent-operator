@@ -3830,6 +3830,46 @@ spec:
                       server, e.g: /something'
                     type: string
                 type: object
+              oracleLogAnalytics:
+                properties:
+                  auth:
+                    properties:
+                      apiSecret:
+                        type: string
+                      profileName:
+                        type: string
+                      region:
+                        type: string
+                      type:
+                        type: string
+                    type: object
+                  globalMetadata:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  logEntityId:
+                    type: string
+                  logEntityType:
+                    type: string
+                  logEventMetadata:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  logGroupId:
+                    type: string
+                  logPath:
+                    type: string
+                  logSetId:
+                    type: string
+                  logSourceName:
+                    type: string
+                  objectStorageNamespace:
+                    type: string
+                  ociConfigInRecord:
+                    type: boolean
+                  profileName:
+                    type: string
+                type: object
               prometheusExporter:
                 description: PrometheusExporter_types defines Prometheus exporter
                   configuration to expose metrics from Fluent Bit.
@@ -23294,6 +23334,46 @@ spec:
                   uri:
                     description: 'Specify an optional HTTP URI for the target web
                       server, e.g: /something'
+                    type: string
+                type: object
+              oracleLogAnalytics:
+                properties:
+                  auth:
+                    properties:
+                      apiSecret:
+                        type: string
+                      profileName:
+                        type: string
+                      region:
+                        type: string
+                      type:
+                        type: string
+                    type: object
+                  globalMetadata:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  logEntityId:
+                    type: string
+                  logEntityType:
+                    type: string
+                  logEventMetadata:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  logGroupId:
+                    type: string
+                  logPath:
+                    type: string
+                  logSetId:
+                    type: string
+                  logSourceName:
+                    type: string
+                  objectStorageNamespace:
+                    type: string
+                  ociConfigInRecord:
+                    type: boolean
+                  profileName:
                     type: string
                 type: object
               prometheusExporter:
