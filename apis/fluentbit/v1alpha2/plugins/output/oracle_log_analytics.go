@@ -19,6 +19,8 @@ type OracleLogAnalytics struct {
 	LogSet                 *string           `json:"logSetId,omitempty"`
 	GlobalMetadata         map[string]string `json:"globalMetadata,omitempty"`
 	LogEventMetadata       map[string]string `json:"logEventMetadata,omitempty"`
+	Workers                *int32            `json:"Workers,omitempty"`
+	*plugins.TLS           `json:"tls,omitempty"`
 }
 
 type AuthConfig struct {
@@ -45,6 +47,9 @@ func (o *OracleLogAnalytics) Params(sl plugins.SecretLoader) (*params.KVs, error
 	}
 	if o.Auth.ProfileName != nil {
 		kvs.Insert("profile_name", *o.Auth.ProfileName)
+	}
+	if o.ObjectStorageNamespace != nil {
+		kvs.Insert("namespace", *o.ObjectStorageNamespace)
 	}
 	if o.OCIConfigInRecord {
 		kvs.Insert("oci_config_in_record", "true")
@@ -76,6 +81,13 @@ func (o *OracleLogAnalytics) Params(sl plugins.SecretLoader) (*params.KVs, error
 		for k, v := range o.LogEventMetadata {
 			kvs.Insert("oci_la_metadata", fmt.Sprintf("%s %s", k, v))
 		}
+	}
+	if o.TLS != nil {
+		tls, err := o.TLS.Params(sl)
+		if err != nil {
+			return nil, err
+		}
+		kvs.Merge(tls)
 	}
 	return kvs, nil
 }
