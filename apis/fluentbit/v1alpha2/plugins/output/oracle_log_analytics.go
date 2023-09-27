@@ -6,6 +6,8 @@ import (
 	"github.com/fluent/fluent-operator/v2/apis/fluentbit/v1alpha2/plugins/params"
 )
 
+// +kubebuilder:object:generate:=true
+
 type OracleLogAnalytics struct {
 	Auth                   *AuthConfig       `json:"auth,omitempty"`
 	OCIConfigInRecord      bool              `json:"ociConfigInRecord,omitempty"`
