@@ -82,6 +82,9 @@ func (o *OracleLogAnalytics) Params(sl plugins.SecretLoader) (*params.KVs, error
 			kvs.Insert("oci_la_metadata", fmt.Sprintf("%s %s", k, v))
 		}
 	}
+	if o.Workers != nil {
+		kvs.Insert("Workers", fmt.Sprint(*o.Workers))
+	}
 	if o.TLS != nil {
 		tls, err := o.TLS.Params(sl)
 		if err != nil {
