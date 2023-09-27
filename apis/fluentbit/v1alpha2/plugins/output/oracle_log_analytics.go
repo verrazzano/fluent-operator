@@ -25,6 +25,8 @@ type OracleLogAnalytics struct {
 	*plugins.TLS           `json:"tls,omitempty"`
 }
 
+// +kubebuilder:object:generate:=true
+
 type AuthConfig struct {
 	Type        *string `json:"type,omitempty"`
 	Region      *string `json:"region,omitempty"`
