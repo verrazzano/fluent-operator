@@ -109,6 +109,10 @@ build-amd64: build-op-amd64 build-fb-amd64 build-fd-amd64
 build-op-amd64:
 	docker build --platform=linux/amd64 -f cmd/fluent-manager/Dockerfile . -t ${FO_IMG}
 
+# Build Verrazzano specific amd64 Fluent Operator container image
+vz-build-op-amd64:
+	docker build --build-arg BASE_IMAGE=${BASE_IMAGE} -f cmd/fluent-manager/Dockerfile . -t ${FO_IMG}
+
 # Build amd64 Fluent Bit container image
 build-fb-amd64:
 	docker build --platform=linux/amd64 -f cmd/fluent-watcher/fluentbit/Dockerfile . -t ${FB_IMG}
