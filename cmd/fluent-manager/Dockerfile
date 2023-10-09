@@ -1,5 +1,5 @@
 # Build the manager binary
-ARG BASE_IMAGE=ghcr.io/verrazzano/verrazzano-base:latest
+ARG BASE_IMAGE
 FROM $BASE_IMAGE as builder
 RUN microdnf install -y \
     golang && \
