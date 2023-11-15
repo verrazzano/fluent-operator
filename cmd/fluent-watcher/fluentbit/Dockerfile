@@ -1,3 +1,4 @@
+ARG FLUENTBIT_BASE
 FROM ghcr.io/verrazzano/verrazzano-base:v1.0.0-20230327155846-4653b27 as buildergo
 RUN microdnf update \
     && microdnf install -y \
@@ -11,7 +12,7 @@ WORKDIR /code
 RUN echo $(ls -al /code)
 RUN CGO_ENABLED=0 go build -ldflags '-w -s' -o /fluent-bit/fluent-bit /code/cmd/fluent-watcher/fluentbit/main.go
 
-FROM ghcr.io/verrazzano/ol8-static:v0.0.1-20231102152128-e7afc807
+FROM $FLUENTBIT_BASE
 LABEL Description="Fluent Bit docker image" Vendor="Verrazzano" Version="2.0.11"
 
 COPY conf/fluent-bit.conf conf/parsers.conf /fluent-bit/etc/
