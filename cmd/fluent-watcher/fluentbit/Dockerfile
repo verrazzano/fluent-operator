@@ -1,5 +1,5 @@
 ARG FLUENTBIT_BASE
-ARG BASE_IMAGE FROM ghcr.io/verrazzano/golang:v1.20.12
+ARG BASE_IMAGE=ghcr.io/verrazzano/golang:v1.20.12
 FROM $BASE_IMAGE as buildergo
 RUN mkdir -p /fluent-bit
 RUN mkdir -p /code
