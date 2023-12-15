@@ -1,10 +1,6 @@
 ARG FLUENTBIT_BASE
-FROM ghcr.io/verrazzano/verrazzano-base:v1.0.0-20230327155846-4653b27 as buildergo
-RUN microdnf update \
-    && microdnf install -y \
-    golang && \
-    microdnf clean all
-
+ARG BASE_IMAGE=ghcr.io/verrazzano/golang:v1.20.12
+FROM $BASE_IMAGE as buildergo
 RUN mkdir -p /fluent-bit
 RUN mkdir -p /code
 COPY . /code/
