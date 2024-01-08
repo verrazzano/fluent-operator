@@ -1,6 +1,6 @@
 # Build the manager binary
-ARG BASE_IMAGE=ghcr.io/verrazzano/golang:v1.20.12
-FROM $BASE_IMAGE as builder
+ARG GO_BASE_IMAGE=ghcr.io/verrazzano/golang:v1.20.12
+FROM $GO_BASE_IMAGE as builder
 
 WORKDIR /workspace
 # Copy the Go Modules manifests
