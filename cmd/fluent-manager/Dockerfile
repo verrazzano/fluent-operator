@@ -1,9 +1,6 @@
 # Build the manager binary
-ARG BASE_IMAGE=ghcr.io/verrazzano/verrazzano-base:latest
+ARG BASE_IMAGE=ghcr.io/verrazzano/golang:v1.20.12
 FROM $BASE_IMAGE as builder
-RUN microdnf install -y \
-    golang && \
-    microdnf clean all
 
 WORKDIR /workspace
 # Copy the Go Modules manifests
