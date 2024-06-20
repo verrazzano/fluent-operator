@@ -88,6 +88,7 @@ type OutputSpec struct {
 	PrometheusExporter *output.PrometheusExporter `json:"prometheusExporter,omitempty"`
 	// PrometheusRemoteWrite_types defines Prometheus Remote Write configuration.
 	PrometheusRemoteWrite *output.PrometheusRemoteWrite `json:"prometheusRemoteWrite,omitempty"`
+	OracleLogAnalytics    *output.OracleLogAnalytics    `json:"oracleLogAnalytics,omitempty"`
 	// CustomPlugin defines Custom Output configuration.
 	CustomPlugin *custom.CustomPlugin `json:"customPlugin,omitempty"`
 }

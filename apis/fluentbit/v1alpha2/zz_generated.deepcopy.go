@@ -1328,6 +1328,11 @@ func (in *OutputSpec) DeepCopyInto(out *OutputSpec) {
 		*out = new(output.PrometheusRemoteWrite)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.OracleLogAnalytics != nil {
+		in, out := &in.OracleLogAnalytics, &out.OracleLogAnalytics
+		*out = new(output.OracleLogAnalytics)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.CustomPlugin != nil {
 		in, out := &in.CustomPlugin, &out.CustomPlugin
 		*out = new(custom.CustomPlugin)
